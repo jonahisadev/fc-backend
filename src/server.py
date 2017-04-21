@@ -30,6 +30,12 @@ class Server:
     def sendData(self, msg, addr, port):
         self.sock.sendto(msg, (addr, port))
         
+    def nameExists(self, name):
+        for conn in self.conns:
+            if (conn.name == name):
+                return True
+        return False
+        
     def getNameByIP(self, host, port):
         for conn in self.conns:
             if (conn.addr == host and conn.port == port):
@@ -51,9 +57,13 @@ class Server:
                 #   /c/
                 #
                 if (args[0] == "/c/"):
-                    self.conns.append(ConnInfo(host, port, args[1]))
-                    self.log("%s connected" % args[1])
-                    self.sendData("/c/~OK", host, port)
+                    if (not self.nameExists(args[1])):
+                        self.conns.append(ConnInfo(host, port, args[1]))
+                        self.log("%s connected" % args[1])
+                        self.sendData("/c/~OK", host, port)
+                    else:
+                        self.log("Attempted login as '%s' from %s" % (args[1], host))
+                        self.sendData("/c/~BADNAME", host, port)
                     
                 #
                 #   /m/
