@@ -30,9 +30,9 @@ class Server:
     def sendData(self, msg, addr, port):
         self.sock.sendto(msg, (addr, port))
         
-    def getNameByHost(self, host):
+    def getNameByIP(self, host, port):
         for conn in self.conns:
-            if (conn.addr == host):
+            if (conn.addr == host and conn.port == port):
                 return conn.name
         return None
     
@@ -59,7 +59,7 @@ class Server:
                 #   /m/
                 #    
                 elif (args[0] == "/m/"):
-                    name = self.getNameByHost(host)
+                    name = self.getNameByIP(host, port)
                     self.log("[%s]: %s" % (name, args[1]))
                     for conn in self.conns:
                         self.sendData("/m/~%s~%s" % (name, args[1]),
