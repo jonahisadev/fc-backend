@@ -19,9 +19,14 @@ class Server:
     def commands(self):
         while True:
             cmd = raw_input("")
+            args = cmd.split(" ")
             if (cmd == "quit"):
-                # Call cleanups
+                self.broadcast("/s/~Server is now offline.")
                 os._exit(0)
+            elif (args[0] ==  "msg"):
+                msg = " ".join(args).replace("msg ", "", 1)
+                self.broadcast("/s/~%s" % msg)
+                self.log("[SERVER] %s" % msg)
             else:
                 print("Unknown command: '%s'" % cmd)
     
@@ -77,6 +82,8 @@ class Server:
                 #   /c/: Connection request
                 #
                 if (args[0] == "/c/"):
+                    if (args[1] == "SERVER"):
+                        self.sendData("/c/~BADNAME", host, port)
                     if (not self.nameExists(args[1])):
                         self.conns.append(ConnInfo(host, port, args[1]))
                         self.log("%s connected" % args[1])
